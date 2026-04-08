@@ -5,7 +5,7 @@ import axios from "axios";
  * Centralizes the base URL and default headers.
  */
 const API = axios.create({
-  baseURL: "http://localhost:8000",
+  baseURL: "https://darkwebbackend.onrender.com",
   headers: {
     "Content-Type": "application/json",
   },
@@ -13,7 +13,6 @@ const API = axios.create({
 
 /**
  * 1. Authentication
- * Used by Login.jsx
  */
 export const loginUser = (credentials) => {
   return API.post("/login", credentials);
@@ -21,7 +20,6 @@ export const loginUser = (credentials) => {
 
 /**
  * 2. Keyword Scanning
- * Used by Dashboard.jsx
  */
 export const scanKeyword = (keyword) => {
   return API.get("/scan", {
@@ -30,27 +28,23 @@ export const scanKeyword = (keyword) => {
 };
 
 /**
- * 3. Fetching Intelligence / Threats
- * Included both names to match your Dashboard imports
+ * 3. Fetch Threat Intelligence
  */
 export const getThreats = () => {
   return API.get("/threats");
 };
 
 export const getIntel = () => {
-  return API.get("/threats"); // Alias for getThreats
+  return API.get("/threats");
 };
 
 /**
- * 4. Reporting
- * Used for file downloads
+ * 4. Download Report
  */
 export const downloadReport = () => {
-  // Fixed: Changed 'api' to 'API' to match the constant above
   return API.get("/report", {
     responseType: "blob",
   });
 };
 
-// Fixed: Changed 'api' to 'API'
 export default API;
