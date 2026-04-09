@@ -2,25 +2,36 @@ import React, { useState } from "react";
 import ThreatCard from "../components/ThreatCard";
 import IntelTable from "../components/IntelTable";
 import Navbar from "../components/Navbar";
-import { scanKeyword, getThreats, downloadReport } from "../api/api";
+
+import {
+  scanKeyword,
+  getThreats,
+  downloadReport
+} from "../api/api";
+
 
 export default function Dashboard() {
 
   const [keyword, setKeyword] = useState("");
   const [threats, setThreats] = useState([]);
   const [intel, setIntel] = useState([]);
+  const [severity, setSeverity] = useState("LOW");
   const [loading, setLoading] = useState(false);
-  const [severity, setSeverity] = useState("");
 
-  /* ==============================
+
+
+  /* =========================
      SCAN
-  ============================== */
+  ========================= */
 
   const handleScan = async () => {
 
     if (!keyword.trim()) {
+
       alert("Enter keyword");
+
       return;
+
     }
 
     setLoading(true);
@@ -29,24 +40,43 @@ export default function Dashboard() {
 
       const res = await scanKeyword(keyword);
 
-      console.log("API RESULT:", res.data);
+      console.log("API RESULT:", res);
 
-      setThreats(res.data.threats || []);
-      setSeverity(res.data.severity || "LOW");
 
-      const intelObj = res.data.intel || {};
+      /* severity */
+
+      setSeverity(res.severity || "LOW");
+
+
+      /* threats */
+
+      setThreats(res.threats || []);
+
+
+      /* intelligence */
+
+      const intelObj = res.intel || {};
+
 
       const rows = [];
+
 
       const maxLength = Math.max(
 
         intelObj.emails?.length || 0,
+
         intelObj.usernames?.length || 0,
+
         intelObj.passwords?.length || 0,
+
         intelObj.api_keys?.length || 0,
+
         intelObj.ips?.length || 0,
+
         intelObj.domains?.length || 0,
+
         intelObj.financial?.cards?.length || 0,
+
         intelObj.financial?.crypto_wallets?.length || 0
 
       );
@@ -84,13 +114,15 @@ export default function Dashboard() {
 
       }
 
+
       setIntel(rows);
 
     }
 
     catch (err) {
 
-      console.error(err);
+      console.error("SCAN ERROR:", err);
+
       alert("Scan failed");
 
     }
@@ -100,9 +132,10 @@ export default function Dashboard() {
   };
 
 
-  /* ==============================
+
+  /* =========================
      HISTORY
-  ============================== */
+  ========================= */
 
   const handleLoadIntel = async () => {
 
@@ -110,7 +143,9 @@ export default function Dashboard() {
 
       const res = await getThreats();
 
-      setIntel(res.data.data || []);
+      console.log("HISTORY:", res);
+
+      setIntel(res.data || []);
 
     }
 
@@ -123,23 +158,27 @@ export default function Dashboard() {
   };
 
 
-  /* ==============================
-     EXPORT PDF
-  ============================== */
+
+  /* =========================
+     EXPORT
+  ========================= */
 
   const handleDownloadReport = async () => {
 
     try {
 
-      const response = await downloadReport();
+      const blob = await downloadReport();
 
       const url = window.URL.createObjectURL(
-        new Blob([response.data])
+
+        new Blob([blob])
+
       );
 
       const link = document.createElement("a");
 
       link.href = url;
+
       link.download = "darkweb_report.pdf";
 
       link.click();
@@ -155,9 +194,10 @@ export default function Dashboard() {
   };
 
 
-  /* ==============================
+
+  /* =========================
      UI
-  ============================== */
+  ========================= */
 
   return (
 
@@ -165,32 +205,49 @@ export default function Dashboard() {
 
       <Navbar />
 
+
       <div style={container}>
 
 
         <h2 style={title}>
+
           Darkweb Intelligence Engine
+
         </h2>
 
+
         <p style={subtitle}>
+
           Scan emails, domains, IPs, API keys & leaked credentials
+
         </p>
 
 
-        {/* search */}
+
+        {/* SEARCH */}
 
         <div style={searchBox}>
 
+
           <input
+
             value={keyword}
+
             onChange={(e)=>setKeyword(e.target.value)}
+
             placeholder="google.com or admin@email.com"
+
             style={input}
+
           />
 
+
           <button
+
             onClick={handleScan}
+
             style={btnBlue}
+
           >
 
             {loading ? "Scanning..." : "Search"}
@@ -198,9 +255,13 @@ export default function Dashboard() {
           </button>
 
 
+
           <button
+
             onClick={handleLoadIntel}
+
             style={btnGray}
+
           >
 
             History
@@ -208,19 +269,25 @@ export default function Dashboard() {
           </button>
 
 
+
           <button
+
             onClick={handleDownloadReport}
+
             style={btnRed}
+
           >
 
             Export
 
           </button>
 
+
         </div>
 
 
-        {/* severity */}
+
+        {/* SEVERITY */}
 
         <div style={severityBox(severity)}>
 
@@ -229,28 +296,40 @@ export default function Dashboard() {
         </div>
 
 
-        {/* grid */}
+
+        {/* GRID */}
 
         <div style={grid}>
 
 
-          {/* threats */}
+          {/* THREATS */}
 
           <div>
 
             <h3 style={sectionTitle}>
+
               Threat Feed
+
             </h3>
 
-            {threats.length === 0 ?
+
+            {
+
+              threats.length === 0
+
+              ?
 
               <div style={empty}>
+
                 No threats detected
+
               </div>
 
               :
 
-              threats.map((t,i)=>
+              threats.map(
+
+                (t,i)=>
 
                 <ThreatCard key={i} data={t}/>
 
@@ -261,23 +340,29 @@ export default function Dashboard() {
           </div>
 
 
-          {/* intelligence */}
+
+          {/* INTELLIGENCE */}
 
           <div>
 
             <h3 style={sectionTitle}>
+
               Extracted Intelligence
+
             </h3>
+
 
             <IntelTable data={intel}/>
 
           </div>
 
 
+
         </div>
 
 
       </div>
+
 
     </div>
 
@@ -286,132 +371,190 @@ export default function Dashboard() {
 }
 
 
-/* ==============================
+
+/* =========================
    STYLES
-============================== */
+========================= */
 
 const page = {
 
   background:"#020617",
+
   minHeight:"100vh",
+
   color:"white"
 
 };
+
 
 const container = {
 
   maxWidth:"1200px",
+
   margin:"auto",
+
   padding:"40px 20px"
 
 };
 
+
 const title = {
 
   fontSize:"28px",
+
   fontWeight:"bold"
 
 };
 
+
 const subtitle = {
 
   color:"#64748b",
+
   marginBottom:"30px"
 
 };
 
+
 const searchBox = {
 
   display:"flex",
+
   gap:"10px",
+
   background:"#0f172a",
+
   padding:"20px",
+
   borderRadius:"10px",
+
   marginBottom:"25px"
 
 };
 
+
 const input = {
 
   flex:1,
+
   padding:"12px",
+
   background:"#020617",
+
   border:"1px solid #334155",
+
   borderRadius:"6px",
+
   color:"white"
 
 };
+
 
 const btnBlue = {
 
   background:"#2563eb",
+
   border:"none",
+
   padding:"10px 18px",
+
   borderRadius:"6px",
+
   color:"white"
 
 };
+
 
 const btnGray = {
 
   background:"#1e293b",
+
   border:"none",
+
   padding:"10px 18px",
+
   borderRadius:"6px",
+
   color:"white"
 
 };
+
 
 const btnRed = {
 
   background:"#dc2626",
+
   border:"none",
+
   padding:"10px 18px",
+
   borderRadius:"6px",
+
   color:"white"
 
 };
 
+
 const grid = {
 
   display:"grid",
+
   gridTemplateColumns:"1fr 1fr",
+
   gap:"30px"
 
 };
 
+
 const sectionTitle = {
 
   marginBottom:"15px",
+
   color:"#94a3b8",
+
   textTransform:"uppercase"
 
 };
 
+
 const empty = {
 
   padding:"40px",
+
   border:"1px dashed #334155",
+
   borderRadius:"10px",
+
   textAlign:"center",
+
   color:"#64748b"
 
 };
 
+
 const severityBox = (level) => ({
 
   padding:"10px",
+
   marginBottom:"20px",
+
   borderRadius:"6px",
+
   fontWeight:"bold",
 
   background:
 
-    level==="CRITICAL" ? "#7f1d1d" :
+    level==="CRITICAL" ? "#7f1d1d"
 
-    level==="HIGH" ? "#991b1b" :
+    :
 
-    level==="MEDIUM" ? "#92400e" :
+    level==="HIGH" ? "#991b1b"
+
+    :
+
+    level==="MEDIUM" ? "#92400e"
+
+    :
 
     "#064e3b"
 
