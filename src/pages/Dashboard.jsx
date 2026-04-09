@@ -13,16 +13,20 @@ import {
 export default function Dashboard() {
 
   const [keyword, setKeyword] = useState("");
+
   const [threats, setThreats] = useState([]);
+
   const [intel, setIntel] = useState([]);
+
   const [severity, setSeverity] = useState("LOW");
+
   const [loading, setLoading] = useState(false);
 
 
 
-  /* =========================
+  /* =====================
      SCAN
-  ========================= */
+  ===================== */
 
   const handleScan = async () => {
 
@@ -40,20 +44,14 @@ export default function Dashboard() {
 
       const res = await scanKeyword(keyword);
 
-      console.log("API RESULT:", res);
+      console.log(res);
 
-
-      /* severity */
 
       setSeverity(res.severity || "LOW");
 
 
-      /* threats */
-
       setThreats(res.threats || []);
 
-
-      /* intelligence */
 
       const intelObj = res.intel || {};
 
@@ -121,21 +119,25 @@ export default function Dashboard() {
 
     catch (err) {
 
-      console.error("SCAN ERROR:", err);
+      console.error(err);
 
       alert("Scan failed");
 
     }
 
-    setLoading(false);
+    finally {
+
+      setLoading(false);
+
+    }
 
   };
 
 
 
-  /* =========================
+  /* =====================
      HISTORY
-  ========================= */
+  ===================== */
 
   const handleLoadIntel = async () => {
 
@@ -143,7 +145,7 @@ export default function Dashboard() {
 
       const res = await getThreats();
 
-      console.log("HISTORY:", res);
+      console.log(res);
 
       setIntel(res.data || []);
 
@@ -151,7 +153,7 @@ export default function Dashboard() {
 
     catch {
 
-      alert("History load failed");
+      alert("History failed");
 
     }
 
@@ -159,9 +161,9 @@ export default function Dashboard() {
 
 
 
-  /* =========================
-     EXPORT
-  ========================= */
+  /* =====================
+     EXPORT PDF
+  ===================== */
 
   const handleDownloadReport = async () => {
 
@@ -174,6 +176,7 @@ export default function Dashboard() {
         new Blob([blob])
 
       );
+
 
       const link = document.createElement("a");
 
@@ -195,13 +198,14 @@ export default function Dashboard() {
 
 
 
-  /* =========================
+  /* =====================
      UI
-  ========================= */
+  ===================== */
 
   return (
 
     <div style={page}>
+
 
       <Navbar />
 
@@ -223,8 +227,6 @@ export default function Dashboard() {
         </p>
 
 
-
-        {/* SEARCH */}
 
         <div style={searchBox}>
 
@@ -287,8 +289,6 @@ export default function Dashboard() {
 
 
 
-        {/* SEVERITY */}
-
         <div style={severityBox(severity)}>
 
           Risk Level: {severity}
@@ -297,12 +297,8 @@ export default function Dashboard() {
 
 
 
-        {/* GRID */}
-
         <div style={grid}>
 
-
-          {/* THREATS */}
 
           <div>
 
@@ -341,8 +337,6 @@ export default function Dashboard() {
 
 
 
-          {/* INTELLIGENCE */}
-
           <div>
 
             <h3 style={sectionTitle}>
@@ -355,7 +349,6 @@ export default function Dashboard() {
             <IntelTable data={intel}/>
 
           </div>
-
 
 
         </div>
@@ -372,190 +365,58 @@ export default function Dashboard() {
 
 
 
-/* =========================
+/* =====================
    STYLES
-========================= */
+===================== */
 
-const page = {
+const page={background:"#020617",minHeight:"100vh",color:"white"};
 
-  background:"#020617",
+const container={maxWidth:"1200px",margin:"auto",padding:"40px 20px"};
 
-  minHeight:"100vh",
+const title={fontSize:"28px",fontWeight:"bold"};
 
-  color:"white"
+const subtitle={color:"#64748b",marginBottom:"30px"};
 
-};
+const searchBox={display:"flex",gap:"10px",background:"#0f172a",padding:"20px",borderRadius:"10px",marginBottom:"25px"};
 
+const input={flex:1,padding:"12px",background:"#020617",border:"1px solid #334155",borderRadius:"6px",color:"white"};
 
-const container = {
+const btnBlue={background:"#2563eb",border:"none",padding:"10px 18px",borderRadius:"6px",color:"white"};
 
-  maxWidth:"1200px",
+const btnGray={background:"#1e293b",border:"none",padding:"10px 18px",borderRadius:"6px",color:"white"};
 
-  margin:"auto",
+const btnRed={background:"#dc2626",border:"none",padding:"10px 18px",borderRadius:"6px",color:"white"};
 
-  padding:"40px 20px"
+const grid={display:"grid",gridTemplateColumns:"1fr 1fr",gap:"30px"};
 
-};
+const sectionTitle={marginBottom:"15px",color:"#94a3b8",textTransform:"uppercase"};
 
+const empty={padding:"40px",border:"1px dashed #334155",borderRadius:"10px",textAlign:"center",color:"#64748b"};
 
-const title = {
+const severityBox=(level)=>({
 
-  fontSize:"28px",
+padding:"10px",
 
-  fontWeight:"bold"
+marginBottom:"20px",
 
-};
+borderRadius:"6px",
 
+fontWeight:"bold",
 
-const subtitle = {
+background:
 
-  color:"#64748b",
+level==="CRITICAL" ? "#7f1d1d"
 
-  marginBottom:"30px"
+:
 
-};
+level==="HIGH" ? "#991b1b"
 
+:
 
-const searchBox = {
+level==="MEDIUM" ? "#92400e"
 
-  display:"flex",
+:
 
-  gap:"10px",
-
-  background:"#0f172a",
-
-  padding:"20px",
-
-  borderRadius:"10px",
-
-  marginBottom:"25px"
-
-};
-
-
-const input = {
-
-  flex:1,
-
-  padding:"12px",
-
-  background:"#020617",
-
-  border:"1px solid #334155",
-
-  borderRadius:"6px",
-
-  color:"white"
-
-};
-
-
-const btnBlue = {
-
-  background:"#2563eb",
-
-  border:"none",
-
-  padding:"10px 18px",
-
-  borderRadius:"6px",
-
-  color:"white"
-
-};
-
-
-const btnGray = {
-
-  background:"#1e293b",
-
-  border:"none",
-
-  padding:"10px 18px",
-
-  borderRadius:"6px",
-
-  color:"white"
-
-};
-
-
-const btnRed = {
-
-  background:"#dc2626",
-
-  border:"none",
-
-  padding:"10px 18px",
-
-  borderRadius:"6px",
-
-  color:"white"
-
-};
-
-
-const grid = {
-
-  display:"grid",
-
-  gridTemplateColumns:"1fr 1fr",
-
-  gap:"30px"
-
-};
-
-
-const sectionTitle = {
-
-  marginBottom:"15px",
-
-  color:"#94a3b8",
-
-  textTransform:"uppercase"
-
-};
-
-
-const empty = {
-
-  padding:"40px",
-
-  border:"1px dashed #334155",
-
-  borderRadius:"10px",
-
-  textAlign:"center",
-
-  color:"#64748b"
-
-};
-
-
-const severityBox = (level) => ({
-
-  padding:"10px",
-
-  marginBottom:"20px",
-
-  borderRadius:"6px",
-
-  fontWeight:"bold",
-
-  background:
-
-    level==="CRITICAL" ? "#7f1d1d"
-
-    :
-
-    level==="HIGH" ? "#991b1b"
-
-    :
-
-    level==="MEDIUM" ? "#92400e"
-
-    :
-
-    "#064e3b"
+"#064e3b"
 
 });
