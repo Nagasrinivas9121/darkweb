@@ -1,61 +1,37 @@
 import axios from "axios";
 
 /*
-GLOBAL API CONFIG
+Backend API URL
 */
 const API = axios.create({
 
   baseURL: "https://darkwebbackend.onrender.com",
 
   headers: {
-
     "Content-Type": "application/json",
-
   },
 
 });
 
 
 /*
-1. LOGIN (optional)
-*/
-export const loginUser = async (credentials) => {
-
-  try {
-
-    const res = await API.post("/login", credentials);
-
-    return res.data;
-
-  } catch (error) {
-
-    console.error("Login error:", error);
-
-    throw error;
-
-  }
-
-};
-
-
-/*
-2. SCAN KEYWORD
+SCAN KEYWORD
 */
 export const scanKeyword = async (keyword) => {
 
   try {
 
-    const res = await API.get("/scan", {
+    const response = await API.get("/scan", {
 
-      params: { keyword },
+      params: { keyword }
 
     });
 
-    return res.data;
+    return response.data;
 
   } catch (error) {
 
-    console.error("Scan failed:", error);
+    console.error("Scan API error:", error);
 
     throw error;
 
@@ -65,71 +41,41 @@ export const scanKeyword = async (keyword) => {
 
 
 /*
-3. GET THREATS HISTORY
+GET THREATS HISTORY
 */
 export const getThreats = async () => {
 
-  try {
+  const response = await API.get("/threats");
 
-    const res = await API.get("/threats");
-
-    return res.data;
-
-  } catch (error) {
-
-    console.error("Threat fetch error:", error);
-
-    throw error;
-
-  }
+  return response.data;
 
 };
 
 
 /*
-4. GET INTELLIGENCE HISTORY
+GET INTELLIGENCE HISTORY
 */
 export const getIntel = async () => {
 
-  try {
+  const response = await API.get("/intel");
 
-    const res = await API.get("/intel");
-
-    return res.data;
-
-  } catch (error) {
-
-    console.error("Intel fetch error:", error);
-
-    throw error;
-
-  }
+  return response.data;
 
 };
 
 
 /*
-5. DOWNLOAD REPORT
+DOWNLOAD REPORT
 */
 export const downloadReport = async () => {
 
-  try {
+  const response = await API.get("/report", {
 
-    const res = await API.get("/report", {
+    responseType: "blob"
 
-      responseType: "blob",
+  });
 
-    });
-
-    return res.data;
-
-  } catch (error) {
-
-    console.error("Report download error:", error);
-
-    throw error;
-
-  }
+  return response.data;
 
 };
 
