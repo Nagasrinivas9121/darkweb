@@ -1,50 +1,137 @@
 import axios from "axios";
 
-/**
- * Global Axios Instance
- * Centralizes the base URL and default headers.
- */
+/*
+GLOBAL API CONFIG
+*/
 const API = axios.create({
+
   baseURL: "https://darkwebbackend.onrender.com",
+
   headers: {
+
     "Content-Type": "application/json",
+
   },
+
 });
 
-/**
- * 1. Authentication
- */
-export const loginUser = (credentials) => {
-  return API.post("/login", credentials);
+
+/*
+1. LOGIN (optional)
+*/
+export const loginUser = async (credentials) => {
+
+  try {
+
+    const res = await API.post("/login", credentials);
+
+    return res.data;
+
+  } catch (error) {
+
+    console.error("Login error:", error);
+
+    throw error;
+
+  }
+
 };
 
-/**
- * 2. Keyword Scanning
- */
-export const scanKeyword = (keyword) => {
-  return API.get("/scan", {
-    params: { keyword },
-  });
+
+/*
+2. SCAN KEYWORD
+*/
+export const scanKeyword = async (keyword) => {
+
+  try {
+
+    const res = await API.get("/scan", {
+
+      params: { keyword },
+
+    });
+
+    return res.data;
+
+  } catch (error) {
+
+    console.error("Scan failed:", error);
+
+    throw error;
+
+  }
+
 };
 
-/**
- * 3. Fetch Threat Intelligence
- */
-export const getThreats = () => {
-  return API.get("/threats");
+
+/*
+3. GET THREATS HISTORY
+*/
+export const getThreats = async () => {
+
+  try {
+
+    const res = await API.get("/threats");
+
+    return res.data;
+
+  } catch (error) {
+
+    console.error("Threat fetch error:", error);
+
+    throw error;
+
+  }
+
 };
 
-export const getIntel = () => {
-  return API.get("/threats");
+
+/*
+4. GET INTELLIGENCE HISTORY
+*/
+export const getIntel = async () => {
+
+  try {
+
+    const res = await API.get("/intel");
+
+    return res.data;
+
+  } catch (error) {
+
+    console.error("Intel fetch error:", error);
+
+    throw error;
+
+  }
+
 };
 
-/**
- * 4. Download Report
- */
-export const downloadReport = () => {
-  return API.get("/report", {
-    responseType: "blob",
-  });
+
+/*
+5. DOWNLOAD REPORT
+*/
+export const downloadReport = async () => {
+
+  try {
+
+    const res = await API.get("/report", {
+
+      responseType: "blob",
+
+    });
+
+    return res.data;
+
+  } catch (error) {
+
+    console.error("Report download error:", error);
+
+    throw error;
+
+  }
+
 };
+
 
 export default API;
